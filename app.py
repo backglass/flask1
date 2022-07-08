@@ -1,5 +1,7 @@
+from os import abort
 import sqlite3
 from flask import Flask, render_template
+from werkzeug.exceptions import abort      # Se usará para crear paginas 404
 
 app = Flask(__name__)
 
@@ -31,12 +33,35 @@ def get_db_connection():
     Por último, la función devuelve el objeto de conexión conn que usará para acceder a la base de datos.
     """
 
-                 # Función que crea una conexión con la base de datos "database.db" y devuelve el objeto de conexión
+                                            # Función que crea una conexión con la base de datos "database.db" y devuelve el objeto de conexión
     conn = sqlite3.connect("database.db")   # Crea el objeto conn con la conexión a la base de datos "database.db"
-    conn.row_factory = sqlite3.Row   # establece el modo de devolución de filas de la base de datos
-    return conn                      # Devuelve el objeto conn con la conexión a la base de datos "database.db"
+    conn.row_factory = sqlite3.Row          # establece el modo de devolución de filas de la base de datos
+    return conn                             # Devuelve el objeto conn con la conexión a la base de datos "database.db"
 
+def get_post(post_id):
+    """
+    Esta nueva función tiene el argumento post_id que determina qué entrada de blog recuperar.
+    Dentro de la función, utiliza la función get_db_connection() para abrir una conexión de base de datos
+    y ejecutar una consulta SQL para obtener la entada de blog asociada con el valor post_id dado.
+    Añade el método fetchone() para obtener el resultado y almacenarlo en la variable post.
+    Luego, cierre la conexión. Si la variable post tiene el valor None, lo que significa
+    que no se ha encontrado ningún resultado en la base de datos, utiliza la función abort()
+    que importó anteriormente para responder con un código de error 404 y la función terminará la ejecución.
+    Si, sin embargo, se encuentra una entrada, devuelve el valor de la variable post.
+    """
+    conn = get_db_connection()              # Abre una conexión con la base de datos y devuelve el objeto conn con la conexión a la base de datos "database.db"
+    post = conn.execute("SELECT * FROM post WHERE id = ?",(post_id)).fetchone() # Ejecuta una consulta SQL para seleccionar una entrada por id de la tabla post
+    conn.close()                            # Cierra la conexión con la base de datos
+    
+    if post is None:                        # Si no existe una entrada con el id indicado, abortará la ejecución de la aplicación
+        abort(404)
+    return post
 
+@app.route("/<int:post_id>")                        # Ruta para recuperar una entrada de blog por id
+def post(post_id):
+
+    post = get_post(post_id)                        # Obtiene la entrada de blog asociada con el id indicado
+    return render_template("post.html",post = post)
 if __name__ == "__main__":  ## Activar Flask  con modo depurador
     app.run(debug=True)
     
