@@ -62,6 +62,8 @@ def post(post_id):
 
     post = get_post(post_id)                        # Obtiene la entrada de blog asociada con el id indicado
     return render_template("post.html",post = post)
+
+    
 if __name__ == "__main__":  ## Activar Flask  con modo depurador
     app.run(debug=True)
     
