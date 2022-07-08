@@ -6,7 +6,22 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+
+    """
+    En esta nueva versión de la función index(), primero abre una conexión de base de datos usando la función get_db_connection()
+    que definió antes. A continuación, ejecuta una consulta SQL para seleccionar todas las entradas de la tabla post.
+    Implementa el método fetchall() para recuperar todas las filas del resultado de la consulta.
+    Esto devolverá una lista de las entradas que insertó en la base de datos en el paso anterior.
+    Cierra la conexión con la base de datos usando el método close() y devuelve el resultado de representar la plantilla index.html.
+    También pasará el objeto posts como argumento, que contiene los resultados que obtuvo de la base de datos;
+    esto le permitirá acceder a las entradas del blog en la plantilla index.html.
+    Con estas modificaciones implementadas, guarde y cierre el archivo app.py. """
+
+
+    conn = get_db_connection()                              # Abre una conexión con la base de datos y devuelve el objeto conn con la conexión a la base de datos "database.db"
+    posts = conn.execute("SELECT * FROM posts").fetchall()  # Ejecuta una consulta SQL para seleccionar todas las entradas de la tabla post
+    conn.close()                                            # Cierra la conexión con la base de datos
+    return render_template("index.html",posts = posts)      # Devuelve el resultado de representar la plantilla index.html y le pasa el objeto posts como argumento
 
 def get_db_connection():
     """
