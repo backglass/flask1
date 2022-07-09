@@ -1,0 +1,30 @@
+<!-- El valor de la entrada del título de la entrada es {{ request.form['title'] }},​​​
+y el área de texto tiene el valor {{ request.form['content'] }}.
+Esto se hace para que los datos que introduce no se pierdan si algo sale mal.
+Por ejemplo, si escribe una entrada larga y olvida darle un título, se mostrará un mensaje
+que le informa de que el título es necesario. Esto sucederá sin perder la entrada que escribió
+ya que se almacenará en el objeto global request al que tiene acceso en sus plantillas.-->
+
+{% extends 'base.html' %}
+
+    {% block content %}
+    <h1>{% block title %} Create a New Post {% endblock %}</h1>
+
+    <form method="post">
+        <div class="form-group">
+            <label for="title">Title</label>
+            <input type="text" name="title"
+                   placeholder="Post title" class="form-control"
+                   value="{{ request.form['title'] }}"></input> <!-- Se hace para resguardar los datos en caso de que fal-->
+        </div>
+    
+        <div class="form-group">
+            <label for="content">Content</label>
+            <textarea name="content" placeholder="Post content"
+                      class="form-control">{{ request.form['content'] }}</textarea> <!-- Se hace para cachear los datos por si algo falla -->
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </form>
+    {% endblock %}
