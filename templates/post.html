@@ -6,7 +6,9 @@ Guarde y cierre el archivo.-->
 {% extends "base.html" %}
 
     {% block content %}
+   
         <h2> {% block title %} {{ post["title"]}} {% endblock %} </h2>
         <span class = "badge, badge-primary"> {{ post["created"]}} </span>
         <p> {{ post["content"] }}</p>
+    
     {% endblock %}
