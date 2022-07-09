@@ -50,7 +50,7 @@ def get_post(post_id):
     Si, sin embargo, se encuentra una entrada, devuelve el valor de la variable post.
     """
     conn = get_db_connection()              # Abre una conexión con la base de datos y devuelve el objeto conn con la conexión a la base de datos "database.db"
-    post = conn.execute("SELECT * FROM post WHERE id = ?",(post_id)).fetchone() # Ejecuta una consulta SQL para seleccionar una entrada por id de la tabla post
+    post = conn.execute("SELECT * FROM posts WHERE id = ?",(post_id,)).fetchone() # Ejecuta una consulta SQL para seleccionar una entrada por id de la tabla post
     conn.close()                            # Cierra la conexión con la base de datos
     
     if post is None:                        # Si no existe una entrada con el id indicado, abortará la ejecución de la aplicación
