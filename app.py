@@ -1,9 +1,10 @@
 from os import abort
 import sqlite3
-from flask import Flask, render_template
+from flask import Flask, render_template,request, url_for, flash, redirect
 from werkzeug.exceptions import abort      # Se usará para crear paginas 404
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'plisados123' # Configurando clave secreta para el cifrado de cookies
 
 
 @app.route("/")
@@ -19,11 +20,11 @@ def index():
     esto le permitirá acceder a las entradas del blog en la plantilla index.html.
     Con estas modificaciones implementadas, guarde y cierre el archivo app.py. """
 
-
     conn = get_db_connection()                              # Abre una conexión con la base de datos y devuelve el objeto conn con la conexión a la base de datos "database.db"
     posts = conn.execute("SELECT * FROM posts").fetchall()  # Ejecuta una consulta SQL para seleccionar todas las entradas de la tabla post
     conn.close()                                            # Cierra la conexión con la base de datos
     return render_template("index.html",posts = posts)      # Devuelve el resultado de representar la plantilla index.html y le pasa el objeto posts como argumento
+
 
 def get_db_connection():
     """
@@ -37,6 +38,7 @@ def get_db_connection():
     conn = sqlite3.connect("database.db")   # Crea el objeto conn con la conexión a la base de datos "database.db"
     conn.row_factory = sqlite3.Row          # establece el modo de devolución de filas de la base de datos
     return conn                             # Devuelve el objeto conn con la conexión a la base de datos "database.db"
+
 
 def get_post(post_id):
     """
@@ -57,13 +59,45 @@ def get_post(post_id):
         abort(404)
     return post
 
+
 @app.route("/<int:post_id>")                        # Ruta para recuperar una entrada de blog por id
 def post(post_id):
 
     post = get_post(post_id)                        # Obtiene la entrada de blog asociada con el id indicado
     return render_template("post.html",post = post)
 
-    
-if __name__ == "__main__":  ## Activar Flask  con modo depurador
+
+@app.route("/create",methods = ["GET","POST"])      # Ruta para crear una entrada de blog nueva y guardarla en la base de datos
+def create():
+    """
+    En la instrucción if asegura que el código que le sigue solo se ejecuta cuando la solicitud es una solicitud POST
+    a través de la comparativa request.method == 'POST'.
+    A continuación, extrae el título enviado y el contenido desde el objeto request.form que le proporciona acceso a 
+    los datos del formulario en la solicitud. Si no se proporciona el título, la condición if not title se cumplirá,
+    mostrando un mensaje al usuario informándole de que el título es obligatorio. Si, por otro lado, se proporciona el título, abrirá una conexión con la función get_db_connection() e insertará el título y el contenido que recibió en la tabla posts.
+    Luego confirma los cambios en la base de datos y cierra la conexión. Tras añadir la entrada de blog a la base de datos,
+    redirige al cliente a la página de índice usando la función redirect() pasándole la URL generada por la función url_for() con el valor 'index' como argumento.
+    Guarde y cierre el archivo.
+    """
+
+
+    if request.method == "POST":                    # Si el método de solicitud es POST, seguirá el flujo de ejecución
+        
+        title = request.form["title"]               # Obtiene el valor del campo title del formulario de solicitud
+        content = request.form["content"]           # Obtiene el valor del campo content del formulario de solicitud
+        
+        if not title or not content:                # Si no se ha introducido un título o contenido, se abortará la ejecución de la aplicación
+            flash("Todos los campos son obligatorios")
+        else:
+            conn = get_db_connection()
+            conn.execute ("INSERT INTO posts (title,content) VALUES (?,?)",(title,content)) # Ejecuta una consulta SQL para insertar una nueva entrada de blog
+            conn.commit()                           # Guarda los cambios en la base de datos
+            conn.close()                            # Cierra la conexión con la base de datos
+            return redirect(url_for("index"))       # Redirige a la página de inicio
+ 
+    return render_template("create.html")
+
+
+if __name__ == "__main__":                           ## Activar Flask  con modo depurador
     app.run(debug=True)
     
