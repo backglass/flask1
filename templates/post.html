@@ -1,0 +1,12 @@
+
+<!-- Añade el bloque title que definió en la plantilla base.html para hacer que el título de la página
+refleje el título de la entrada que se muestra en un encabezado <h2> al mismo tiempo.
+Guarde y cierre el archivo.-->
+
+{% extends "base.html" %}
+
+    {% block content %}
+        <h2> {% block title %} {{ post["title"]}} {% endblock %} </h2>
+        <span class = "badge, badge-primary"> {{ post["created"]}} </span>
+        <p> {{ post["content"] }}</p>
+    {% endblock %}
