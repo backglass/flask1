@@ -1,5 +1,5 @@
-from os import abort
 import sqlite3
+from webbrowser import get
 from flask import Flask, render_template,request, url_for, flash, redirect
 from werkzeug.exceptions import abort      # Se usará para crear paginas 404
 
@@ -86,7 +86,7 @@ def create():
         title = request.form["title"]               # Obtiene el valor del campo title del formulario de solicitud
         content = request.form["content"]           # Obtiene el valor del campo content del formulario de solicitud
         
-        if not title or not content:                # Si no se ha introducido un título o contenido, se abortará la ejecución de la aplicación
+        if not title or not content:                # Si no se ha introducido un título mostrara un mensaje al usuario
             flash("Todos los campos son obligatorios")
         else:
             conn = get_db_connection()
@@ -96,6 +96,38 @@ def create():
             return redirect(url_for("index"))       # Redirige a la página de inicio
  
     return render_template("create.html")
+
+
+
+@app.route("/<int:id>/edit", methods=["GET","POST"])
+def edit(id):
+    """
+    La entrada que edita viene determinada por la URL y Flask pasará el número de ID a la función edit() a través del argumento id. Añade este valor
+    a la función get_post() para recuperar la entrada asociada con el ID proporcionado desde la base de datos. Los nuevos datos vendrán en una solicitud POST,
+    que se gestiona dentro de la condición if request.method == 'POST'.
+    Igual que cuando creó una nueva entrada, primero extrae los datos del objeto request.form,
+    luego muestra un mensaje si el título tiene un valor vacío, de lo contrario, abre una conexión con la base de datos. Luego actualiza la tabla posts estableciendo un nuevo título y nuevo contenido donde el ID de la entrada en la base de datos es igual al ID que estaba en la URL.
+    En el caso de una solicitud GET, representa una plantilla edit.html
+    pasando la variable post que alberga el valor devuelto de la función get_post(). Usará esto para mostrar el título existente y el contenido en la página de edición."""
+    
+    post = get_post(id)                         # Obtiene la entrada de blog asociada con el id indicado
+
+    if request.method == "POST":                # Si el método de solicitud es POST, seguirá el flujo de ejecución
+        title = request.form["title"]           # Obtiene el valor del campo title del formulario de solicitud
+        content = request.form["content"]       # Obtiene el valor del campo content del formulario de solicitud
+
+        if not title:                           # Si no se ha introducido un título mostrara un mensaje al usuario
+           flash("Ambos campos requeridos")
+    
+        else:                                   # Si se ha introducido un título, abrirá una conexión con la función get_db_connection() 
+                                                # e insertará el título y el contenido que recibió en la tabla posts.
+            conn = get_db_connection()
+            conn.execute("UPDATE posts SET title = ?, content = ?" " WHERE id = ?", (title, content, id))
+            conn.commit()
+            conn.close()
+        return redirect(url_for("index"))       # Redirige a la página de inicio cuando se ha actualiza una entrada de blog
+
+    return render_template("edit.html", post = post)    # Muestra la plantilla edit.html pasándole el valor de la variable post
 
 
 if __name__ == "__main__":                           ## Activar Flask  con modo depurador
