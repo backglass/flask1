@@ -24,9 +24,12 @@
             <li class="nav-item">
               <a class="nav-link" href="{{url_for('create')}}">New Post</a>  <!-- Aquí utiliza url_for() para generar el enlace a la página de crear nuevo post. que viene desde la funcion create -->
           </li>
+          
             </ul>
         </div>
     </nav>
+
+    
     <div class="container">
       {% for message in get_flashed_messages() %}  <!-- mira si hay mensajes flash en la sesion -->  
         <div class="alert alert-danger">{{ message }}</div>
