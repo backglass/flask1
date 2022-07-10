@@ -9,6 +9,9 @@
             <h2>{{ post["title"] }}</h2>                             <!-- Esto es una forma de imprimir el título de cada registro de la base de datos -->
         </a>
         <span class = "badge badge-primary">{{ post["created"] }}</span> <!-- Esto es una forma de imprimir la fecha de creación de cada registro de la base de datos -->
+        
+        <a href="{{ url_for('edit', id=post['id']) }}">                 <!-- Crea un pequeño icono y hace el enlace para editar el post -->
+            <span class="badge badge-warning">Edit</span>
         <br>
     {% endfor %}                                                        <!-- Se cierra el bucle for-->
 
