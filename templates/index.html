@@ -5,7 +5,7 @@
                                                                     para la página y como encabezado que aparece bajo la barra de navegación heredada de la plantilla base  -->
     {% for post in posts %}                                          <!-- Bucle para recorrer todos los elementos de post, que son los registros de la base de datos -->
         
-        <a href="{{ url_for("post",post_id = post["id"]) }}">        <!-- va a la funcion post y con el bucle for ira recorriendo uno a uno cada id -->
+        <a href="{{ url_for('post',post_id = post['id']) }}">        <!-- va a la funcion post y con el bucle for ira recorriendo uno a uno cada id -->
             <h2>{{ post["title"] }}</h2>                             <!-- Esto es una forma de imprimir el título de cada registro de la base de datos -->
         </a>
         <span class = "badge badge-primary">{{ post["created"] }}</span> <!-- Esto es una forma de imprimir la fecha de creación de cada registro de la base de datos -->
