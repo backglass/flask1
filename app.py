@@ -130,6 +130,17 @@ def edit(id):
     return render_template("edit.html", post = post)    # Muestra la plantilla edit.html pasándole el valor de la variable post
 
 
+@app.route("/<int:id>/delete", methods = ("POST",))   # Ruta para eliminar una entrada de blog por id
+def delete(id):
+    post = get_post(id)                                     # Obtiene la entrada de blog asociada con el id indicado y la guarda en la variable post
+    conn = get_db_connection()
+    conn.execute("DELETE FROM posts WHERE id = ?",(id,))    # Elimina la entrada de blog de la base de datos con el id indicado
+    conn.commit()
+    conn.close()
+    flash('"{}" was successfully deleted!'.format(post['title']))   # Muestra un mensaje al usuario informándole de que la entrada de blog ha sido eliminada
+    return redirect(url_for("index"))                               # Redirige a la página de inicio
+
+
 if __name__ == "__main__":                           ## Activar Flask  con modo depurador
     app.run(debug=True)
     
